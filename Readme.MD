@@ -133,7 +133,7 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, enviar P
 Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
 
 ## 📞 **Contato**
-- **Fernando Moura**: [Fernando Moura](https://linkedin.com/in/nandumoura)
+- **Fernando Moura**: [Fernando Moura](https://www.linkedin.com/in/fernando-a-moura/)
 
 
 ---
