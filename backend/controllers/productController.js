@@ -75,3 +75,14 @@ exports.getProduct = (req, res) => {
 
   return res.status(404).json({ message: "Produto não encontrado." });
 };
+
+exports.testCache = (req, res) => {
+  const { id } = req.params;
+  
+  if (ProductCache.isProductCached(id)) {
+    const product = ProductCache.getProduct(id);
+    return res.status(200).json({ message: "Produto encontrado no cache", product });
+  } else {
+    return res.status(404).json({ message: "Produto não encontrado no cache" });
+  }
+};
