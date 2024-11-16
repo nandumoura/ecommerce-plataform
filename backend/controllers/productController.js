@@ -86,3 +86,44 @@ exports.testCache = (req, res) => {
     return res.status(404).json({ message: "Produto não encontrado no cache" });
   }
 };
+
+exports.updateProduct = (req, res) => {
+  const { id } = req.params;
+  const { name, price, attribute } = req.body;
+
+  const productIndex = products.findIndex((p) => p.id === parseInt(id));
+  if (productIndex === -1) {
+    return res.status(404).json({ message: "Produto não encontrado." });
+  }
+
+  // Atualizar o produto
+  const product = products[productIndex];
+  product.name = name || product.name;
+  product.price = price || product.price;
+  product.attribute = attribute || product.attribute;
+
+  // Atualizar no cache
+  ProductCache.setProduct(id, product);
+
+  return res.status(200).json({
+    message: "Produto atualizado com sucesso!",
+    product,
+  });
+};
+
+exports.deleteProduct = (req, res) => {
+  const { id } = req.params;
+
+  const productIndex = products.findIndex((p) => p.id === parseInt(id));
+  if (productIndex === -1) {
+    return res.status(404).json({ message: "Produto não encontrado." });
+  }
+
+  // Remover o produto
+  products.splice(productIndex, 1);
+
+  // Remover do cache
+  ProductCache.removeProduct(id);
+
+  return res.status(200).json({ message: "Produto deletado com sucesso." });
+};
