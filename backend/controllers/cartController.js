@@ -26,7 +26,7 @@ exports.addToCart = (req, res) => {
 exports.getCart = (req, res) => {
   return res.status(200).json({
     total: cart.getTotalPrice(),
-    items: cart.getCartSummary(),
+    items: cart.items,
   });
 };
 

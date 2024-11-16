@@ -13,8 +13,8 @@ const Cart = () => {
       ) : (
         cart.items.map((item, index) => (
           <div key={index} className={styles.cartItem}>
-            <span>{item}</span>
-            <span>R$ {item}</span>
+            <span>{item.name}</span>
+            <span>R$ {item.price}</span>
           </div>
         ))
       )}
