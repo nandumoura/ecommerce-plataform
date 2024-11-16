@@ -1,4 +1,4 @@
-
+---
 
 # 🛒 Plataforma de E-commerce Modular
 
@@ -8,13 +8,14 @@ Este é um projeto de estudo de uma **Plataforma de E-commerce** modular, criado
 ### 📚 **Objetivos do Projeto**
 - Consolidar o conhecimento dos padrões de projeto, aplicando cada um em uma funcionalidade específica.
 - Criar uma arquitetura extensível e modular para uma plataforma de e-commerce.
-- Aprender a lidar com integrações e conceitos avançados, como caching, autenticação, e APIs de pagamento.
+- Implementar conceitos avançados, como caching, autenticação e integração com APIs de pagamento.
 
 ## 🛠️ **Tecnologias Utilizadas**
 ### Backend
 - **Node.js** e **Express**
 - **Cors** para controle de acesso
 - **Dotenv** para gerenciamento de variáveis de ambiente
+- **Nodemon** para hot reload do backend
 
 ### Frontend
 - **React** com **Vite**
@@ -22,18 +23,18 @@ Este é um projeto de estudo de uma **Plataforma de E-commerce** modular, criado
 - **CSS Modules** ou **Styled Components** (a adicionar)
 
 ### Outros
-- **Nodemon** para hot reload do backend
+- **Cache com Singleton** para simulação de cache com TTL (opção de uso de MongoDB ou Redis para futuro aprimoramento)
 - **ESLint** para padronização de código (opcional)
-- **Banco de Dados**: Singleton para simulação de cache (MongoDB ou Redis como opções avançadas)
 
-## ⚙️ **Funcionalidades Planejadas**
+## ⚙️ **Funcionalidades Implementadas**
 - [x] Configuração inicial do projeto (frontend e backend)
 - [x] Catálogo de produtos
+- [x] Gerenciamento de cache com TTL (Singleton)
+- [x] Controle de estoque com notificações (Observer Pattern)
+- [x] Estratégias de precificação (Strategy Pattern)
 - [ ] Carrinho de compras
 - [ ] Sistema de checkout com integração de pagamentos
-- [ ] Sistema de plugins para funcionalidades adicionais
 - [ ] Painel administrativo para gerenciamento de produtos
-- [ ] Implementação dos padrões de projeto GoF
 
 ## 🚀 **Como Rodar o Projeto**
 
@@ -86,10 +87,9 @@ Este é um projeto de estudo de uma **Plataforma de E-commerce** modular, criado
 ecommerce-platform
 ├── backend
 │   ├── controllers       # Controladores para manipulação de dados
-│   ├── models            # Modelos de dados (futuros)
+│   ├── models            # Modelos de dados
 │   ├── routes            # Rotas da API
-│   ├── services          # Serviços de negócio
-│   ├── utils             # Utilitários e padrões de projeto
+│   ├── utils             # Padrões de projeto e utilitários
 │   ├── app.js            # Configuração do app Express
 │   └── server.js         # Inicialização do servidor
 ├── frontend
@@ -107,17 +107,38 @@ ecommerce-platform
 └── README.md             # Documentação do projeto
 ```
 
-## 🧑‍💻 **Desafios e Próximos Passos**
-### Padrões de Projeto
-1. **Singleton**: Implementar o Singleton para o cache de produtos e configuração global.
-2. **Factory Method**: Criar uma fábrica para instanciar diferentes tipos de produtos (físicos, digitais).
-3. **Decorator**: Adicionar um sistema de desconto para produtos usando o padrão Decorator.
-4. **Observer**: Implementar notificações de pedido usando o padrão Observer.
+## 🧑‍💻 **Padrões de Projeto Implementados**
+1. **Singleton**: Utilizado para gerenciamento de cache com TTL e configurações globais.
+2. **Factory Method**: Implementado para criação de diferentes tipos de produtos.
+3. **Observer**: Controle de estoque e notificações de baixa quantidade.
+4. **Strategy**: Diferentes estratégias de precificação (preço fixo, desconto, promoção).
+5. **Template Method** (Planejado): Para diferentes processos de checkout.
+6. **Decorator** (Planejado): Para aplicar descontos adicionais em produtos.
 
-### Funcionalidades Futuras
-- Sistema de autenticação e autorização para o painel administrativo
-- Integração com APIs de pagamento (Stripe, PayPal)
-- Sistema de relatórios para análise de vendas
+### Exemplos de Uso:
+- **Singleton - Cache**:
+  ```javascript
+  const ProductCache = require('./utils/patterns/ProductCache');
+  ProductCache.setProduct(id, product);
+  ```
+
+- **Observer - Controle de Estoque**:
+  ```javascript
+  inventory.addObserver(new LowStockNotifier());
+  inventory.updateStock(id, quantity);
+  ```
+
+- **Strategy - Precificação**:
+  ```javascript
+  const strategy = new DiscountStrategy(10);
+  const finalPrice = strategy.calculate(product.price);
+  ```
+
+## 🧩 **Próximos Passos**
+- **Carrinho de Compras**: Implementação do carrinho usando o padrão Composite para estrutura de itens.
+- **Checkout**: Integrar com APIs de pagamento como Stripe e PayPal.
+- **Autenticação**: Sistema de login e painel administrativo com JWT.
+- **Sistema de Plugins**: Utilizar o padrão Observer para criar plugins customizáveis para a loja.
 
 ## 📦 **Contribuindo**
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, enviar PRs ou sugerir melhorias.
@@ -133,12 +154,11 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, enviar P
 Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
 
 ## 📞 **Contato**
-- **Fernando Moura**: [Fernando Moura](https://www.linkedin.com/in/fernando-a-moura/)
-
+- **Fernando Moura**: [LinkedIn](https://www.linkedin.com/in/fernando-a-moura/)
 
 ---
 
 ### ✨ **Pronto para começar?**
 Clone o repositório, configure o ambiente e vamos implementar juntos uma plataforma de e-commerce modular usando todos os padrões de projeto!
 
-Se precisar de mais alguma coisa, estou à disposição!
+---

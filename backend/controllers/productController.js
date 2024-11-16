@@ -2,11 +2,37 @@
 const ProductCache = require("../utils/patterns/ProductCache");
 const ProductFactory = require("../models/ProductFactory");
 
+const Inventory = require("../utils/patterns/Inventory");
+const LowStockNotifier = require("../utils/patterns/LowStockNotifier");
+
+const inventory = new Inventory();
+const lowStockNotifier = new LowStockNotifier();
+inventory.addObserver(lowStockNotifier);
+
 let products = [
   { id: 1, name: "Produto A", price: 100 },
   { id: 2, name: "Produto B", price: 150 },
   { id: 3, name: "Produto C", price: 200 },
 ];
+
+
+exports.updateStock = (req, res) => {
+  const { id, quantity } = req.body;
+
+  // Verifica se o produto existe
+  const productExists = products.find((p) => p.id === parseInt(id));
+  if (!productExists) {
+    return res.status(404).json({ message: "Produto não encontrado." });
+  }
+
+  // Atualiza o estoque do produto
+  inventory.updateStock(id, quantity);
+
+  return res.status(200).json({
+    message: "Estoque atualizado com sucesso!",
+    currentStock: inventory.getStock(id),
+  });
+};
 
 // Função para verificar se o produto já existe (no cache ou na lista de produtos)
 const productExists = (id, name) => {
@@ -126,4 +152,29 @@ exports.deleteProduct = (req, res) => {
   ProductCache.removeProduct(id);
 
   return res.status(200).json({ message: "Produto deletado com sucesso." });
+};
+
+const { FixedPriceStrategy, DiscountStrategy, PromotionStrategy } = require("../utils/patterns/PricingStrategy");
+
+exports.getPrice = (req, res) => {
+  const { id, strategyType, discountPercentage, buy, getFree } = req.body;
+  const product = products.find((p) => p.id === parseInt(id));
+
+  if (!product) {
+    return res.status(404).json({ message: "Produto não encontrado." });
+  }
+
+  let strategy;
+  if (strategyType === "fixed") {
+    strategy = new FixedPriceStrategy();
+  } else if (strategyType === "discount") {
+    strategy = new DiscountStrategy(discountPercentage);
+  } else if (strategyType === "promotion") {
+    strategy = new PromotionStrategy(buy, getFree);
+  }
+
+  const finalPrice = strategy.calculate(product.price);
+  return res.status(200).json({
+    message: `Preço final calculado com a estratégia ${strategyType}: ${finalPrice} reais.`,
+  });
 };
