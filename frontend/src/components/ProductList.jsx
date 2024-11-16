@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { CartContext } from '../context/CartProvider';
+import styles from './ProductList.module.css';
 
 const products = [
   { id: 1, name: 'Produto A', price: 100, type: 'product', quantity: 1 },
@@ -18,16 +19,19 @@ const ProductList = () => {
   };
 
   return (
-    <div>
-      <h2>Lista de Produtos</h2>
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>
-            <h4>{product.name}</h4>
-            <button onClick={() => handleAddToCart(product)}>Adicionar ao Carrinho</button>
-          </li>
-        ))}
-      </ul>
+    <div className={styles.container}>
+      {products.map((product) => (
+        <div key={product.id} className={styles.productCard}>
+          <h3 className={styles.productTitle}>{product.name}</h3>
+          <p className={styles.productPrice}>R$ {product.price}</p>
+          <button
+            className={styles.addToCartButton}
+            onClick={() => handleAddToCart(product)}
+          >
+            Adicionar ao Carrinho
+          </button>
+        </div>
+      ))}
     </div>
   );
 };
