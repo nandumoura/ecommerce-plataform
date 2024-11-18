@@ -1,17 +1,18 @@
 // backend/models/ProductFactory.js
+const Product = require("./Product");
 const PhysicalProduct = require("./PhysicalProduct");
 const DigitalProduct = require("./DigitalProduct");
 
 class ProductFactory {
-  static createProduct(type, id, name, price, attribute) {
+  static createProduct(type, id, name, price, attribute, quantity = 1) {
     if (type === "physical") {
-      return new PhysicalProduct(id, name, price, attribute); // attribute é o peso
+      return new PhysicalProduct(id, name, price, quantity, attribute);
     }
     if (type === "digital") {
-      return new DigitalProduct(id, name, price, attribute); // attribute é o tamanho do arquivo
+      return new DigitalProduct(id, name, price, quantity, attribute);
     }
-
-    throw new Error("Tipo de produto não suportado.");
+    // Caso seja um produto genérico
+    return new Product(id, name, price, quantity, type, attribute);
   }
 }
 

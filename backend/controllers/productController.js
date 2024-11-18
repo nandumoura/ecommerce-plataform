@@ -2,6 +2,7 @@
 const ProductCache = require("../utils/patterns/ProductCache");
 const ProductFactory = require("../models/ProductFactory");
 
+const rehydrateProduct = require("../utils/rehydrateProduct");
 const Inventory = require("../utils/patterns/Inventory");
 const LowStockNotifier = require("../utils/patterns/LowStockNotifier");
 
@@ -10,11 +11,10 @@ const lowStockNotifier = new LowStockNotifier();
 inventory.addObserver(lowStockNotifier);
 
 let products = [
-  { id: 1, name: "Produto A", price: 100 },
-  { id: 2, name: "Produto B", price: 150 },
-  { id: 3, name: "Produto C", price: 200 },
+  { id: 1, name: "Produto A", price: 100, type: "product" },
+  { id: 2, name: "Produto B", price: 150, type: "product" },
+  { id: 3, name: "Produto C", price: 200, type: "product" },
 ];
-
 
 exports.updateStock = (req, res) => {
   const { id, quantity } = req.body;
@@ -43,7 +43,9 @@ const productExists = (id, name) => {
   }
 
   // Verifica na lista de produtos
-  const productInList = products.find((p) => p.id === id || p.name.toLowerCase() === name.toLowerCase());
+  const productInList = products.find(
+    (p) => p.id === id || p.name.toLowerCase() === name.toLowerCase()
+  );
   if (productInList) {
     console.log("Produto encontrado na lista.");
     return true;
@@ -53,7 +55,7 @@ const productExists = (id, name) => {
 };
 
 exports.createProduct = (req, res) => {
-  const { type, id, name, price, attribute } = req.body;
+  const { type, id, name, price, attribute, quantity = 1 } = req.body;
 
   // Verifica se o produto já existe
   if (productExists(id, name)) {
@@ -61,16 +63,18 @@ exports.createProduct = (req, res) => {
   }
 
   try {
-    // Cria o produto usando a fábrica
-    const product = ProductFactory.createProduct(type, id, name, price, attribute);
-    
-    // Adiciona o produto ao array 'products' (simulando banco de dados)
-    products.push(product);
+    const product = ProductFactory.createProduct(
+      type,
+      id,
+      name,
+      price,
+      attribute,
+      quantity
+    );
 
-    // Armazena o produto no cache
+    products.push(product);
     ProductCache.setProduct(id, product);
 
-    // Retorna sucesso
     return res.status(201).json({
       message: "Produto criado com sucesso!",
       product: product.getProductInfo(),
@@ -83,20 +87,15 @@ exports.createProduct = (req, res) => {
 exports.getProduct = (req, res) => {
   const { id } = req.params;
 
-  // Verifica se o produto está no cache
   if (ProductCache.isProductCached(id)) {
-    console.log("Produto encontrado no cache.");
-    return res.status(200).json(ProductCache.getProduct(id));
+    const product = ProductCache.getProduct(id);
+    return res.status(200).json(product.getProductInfo());
   }
 
-  // Se não estiver no cache, encontra o produto no "banco de dados" (aqui, simulado)
   const product = products.find((p) => p.id === parseInt(id));
-
   if (product) {
-    // Armazena o produto no cache
     ProductCache.setProduct(id, product);
-    console.log("Produto adicionado ao cache.");
-    return res.status(200).json(product);
+    return res.status(200).json(product.getProductInfo());
   }
 
   return res.status(404).json({ message: "Produto não encontrado." });
@@ -104,10 +103,12 @@ exports.getProduct = (req, res) => {
 
 exports.testCache = (req, res) => {
   const { id } = req.params;
-  
+
   if (ProductCache.isProductCached(id)) {
     const product = ProductCache.getProduct(id);
-    return res.status(200).json({ message: "Produto encontrado no cache", product });
+    return res
+      .status(200)
+      .json({ message: "Produto encontrado no cache", product });
   } else {
     return res.status(404).json({ message: "Produto não encontrado no cache" });
   }
@@ -154,7 +155,11 @@ exports.deleteProduct = (req, res) => {
   return res.status(200).json({ message: "Produto deletado com sucesso." });
 };
 
-const { FixedPriceStrategy, DiscountStrategy, PromotionStrategy } = require("../utils/patterns/PricingStrategy");
+const {
+  FixedPriceStrategy,
+  DiscountStrategy,
+  PromotionStrategy,
+} = require("../utils/patterns/PricingStrategy");
 
 exports.getPrice = (req, res) => {
   const { id, strategyType, discountPercentage, buy, getFree } = req.body;
