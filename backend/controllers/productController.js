@@ -87,14 +87,25 @@ exports.createProduct = (req, res) => {
 exports.getProduct = (req, res) => {
   const { id } = req.params;
 
+  // Verifica se o produto está no cache
   if (ProductCache.isProductCached(id)) {
-    const product = ProductCache.getProduct(id);
+    console.log("Produto encontrado no cache.");
+    const cachedProduct = ProductCache.getProduct(id);
+
+    // Reidratar o produto para uma instância de Product
+    const product = rehydrateProduct(cachedProduct);
+
     return res.status(200).json(product.getProductInfo());
   }
 
-  const product = products.find((p) => p.id === parseInt(id));
-  if (product) {
+  // Se não estiver no cache, encontra o produto no "banco de dados" (aqui, simulado)
+  const productData = products.find((p) => p.id === parseInt(id));
+  if (productData) {
+    const product = rehydrateProduct(productData);
+
+    // Armazena o produto no cache
     ProductCache.setProduct(id, product);
+    console.log("Produto adicionado ao cache.");
     return res.status(200).json(product.getProductInfo());
   }
 
